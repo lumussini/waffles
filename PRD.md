@@ -27,6 +27,7 @@ The attached spreadsheet screenshot is the visual/product reference.
 - Preserve the playful personality of the spreadsheet.
 - Make veganization a first-class option.
 - Keep recipe/calculation logic independent from the UI so it can later be reused by a native app.
+- Ship in English and German with automatic locale detection (and a manual `?lang`/`?locale` override).
 
 ### Non-goals for v1
 
@@ -74,11 +75,16 @@ The spreadsheet's base recipe is for **4 waffles**.
 Malk is when you choose Veganize, Milk otherwise
 Margarine is when you choose Veganize, Butter otherwise
 Margarine can be replaced by Oil then 10ml should be used instead of 15g
+
+**Implementation notes**
+
+- The recipe is encoded in the data model with `baseServings: 4`, so the per-1-waffle numbers above are stored ×4 (e.g. Milk 180 ml for 4 waffles). Scaling factor is `target count / 4`.
+- Vinegar appeared in the spreadsheet screenshot without any visible quantity; it was **removed from the recipe entirely** by product decision, so the v1 app has no vinegar ingredient.
 ---
 
 ## 4. Core calculation
 
-The source recipe is defined for 1 waffle.
+The source recipe is encoded in the data model for **4 waffles** (`baseServings: 4`); other counts scale linearly with factor `count / 4`.
 
 Examples:
 
@@ -131,9 +137,13 @@ The calculation engine must use numeric values rather than string manipulation.
 
 ### Recommendation copy
 
-Show a small helper message close to the waffle count:
+Show the serving guidance as a short tip rather than persistent text:
 
-> 2 per adult, 1.5 per kid recommended
+- A subtle `?` button in the count-card header opens the tip.
+- Waffly (the mascot) presents the tip in a comic-font speech bubble.
+- The tip auto-hides after ~4.5 s; tapping Waffly (or Enter/Space when focused) dismisses it immediately.
+
+> Recommended serving: 2 per adult, 1.5 per kid.
 
 This is guidance only; it does not need to automatically calculate servings in v1.
 
@@ -216,6 +226,8 @@ type Ingredient = {
   veganName?: string
   baseQuantity: number | null
   unit: string
+  veganBaseQuantity?: number
+  veganUnit?: string
 }
 ```
 
@@ -283,28 +295,27 @@ Recommended structure:
 │  Ultimate waffle ingredients    │
 │  calculator                     │
 │                                 │
-│  How many waffles?              │
+│  How many waffles?            ? │
 │       −   4   +                 │
 │                                 │
-│  2 per adult, 1.5 per kid       │
-│  recommended                    │
-│                                 │
 │  ┌───────────────────────────┐  │
-│  │ Malk             180 ml   │  │
+│  │ Milk             180 ml   │  │
 │  │ Flour            120 g    │  │
-│  │ Margarine          60 g   │  │
+│  │ Butter             60 g   │  │
 │  │ Baking powder       7 g   │  │
 │  │ Sugar              6.8 g  │  │
 │  │ Salt               1.2 g  │  │
 │  │ Vanilla extract    1.2 ml │  │
-│  │ Vinegar              ...  │  │
 │  └───────────────────────────┘  │
 │                                 │
 │  ☑ VEGANIZE!?                   │
 │                                 │
-│        [ waffle illustration ]  │
+│   [ Waffly: "It's waffle time!"]│
+│        [ waffle mascot ]        │
 └─────────────────────────────────┘
 ```
+
+The `?` next to "How many waffles?" opens the serving tip via Waffly. On mobile, Waffly floats as a tappable mascot and only appears while a tip is visible; on desktop it is permanent side art next to the calculator.
 
 This is a conceptual layout, not a pixel-perfect requirement.
 
@@ -354,9 +365,9 @@ The implementation should use a small, intentional design system rather than man
 
 ### Typography
 
-Use a friendly display font for the title if a suitable web font is available, with a highly readable sans-serif for controls and ingredient values.
-
-The app must remain usable if the display font fails to load.
+- Title and Waffly's speech bubble use the display font **Lilita One** (comic-style, loaded from Google Fonts).
+- Body, controls, and ingredient values use **Nunito**.
+- The app must remain usable if the web fonts fail to load (fallbacks: Trebuchet MS / Comic Sans MS, system sans).
 
 ---
 
@@ -437,6 +448,12 @@ src/
     IngredientList.tsx
     IngredientRow.tsx
     VeganToggle.tsx
+    WaffleIllustration.tsx
+    WafflyCompanion.tsx
+  i18n/
+    messages.ts
+    locale.ts
+    I18nContext.tsx
   recipes/
     types.ts
     waffles.ts
@@ -444,14 +461,19 @@ src/
   domain/
     calculateRecipe.ts
     formatQuantity.ts
-  styles/
-    ...
+  state/
+    storage.ts
   main.tsx
 
 tests/
   domain/
     calculateRecipe.test.ts
     formatQuantity.test.ts
+  i18n/
+    locale.test.ts
+    messages.test.ts
+  ui/
+    WaffleCalculator.test.tsx
 ```
 
 The exact structure may differ if the implementation has a good reason, but the separation between domain logic, recipe data, and presentation should remain.
@@ -464,14 +486,13 @@ The first release is a web app.
 
 It should be easy to evolve into a native application later.
 
-For v1:
+For v1 (implemented):
 
 - responsive UI
-- no browser-specific functionality unless necessary
-- no backend dependency
-- no authentication
-- recipe/calculation logic isolated from browser APIs
-- optional PWA manifest/service worker if low effort
+- no backend dependency, no authentication
+- recipe/calculation logic isolated from browser APIs (plain TypeScript, reusable by a Capacitor/native app later)
+- PWA: web manifest + service worker; the app shell, hashed JS/CSS, icon and manifest are **precached at build time**, so the app works offline after the first visit (stale-while-revalidate for runtime requests)
+- Locale detection reads `navigator.language`, which behaves the same inside a Capacitor WebView
 
 Do not build a native wrapper yet.
 
@@ -532,14 +553,17 @@ Verify:
 - maximum is respected
 - quantities update immediately
 - vegan toggle changes the displayed labels
+- veganize does not break ingredients that have no vegan variant
 - waffle count remains unchanged when toggling vegan mode
+- Waffly shows a welcome tip on load, auto-hides it, and dismisses it on tap
+- German renders when `?lang=de` is set; unsupported locales fall back to English
 
 ### Example acceptance test
 
 Given:
 
 - waffle count = 8
-- vegan = off
+- vegan = on
 
 Then the ingredient list includes:
 
@@ -550,6 +574,8 @@ Then the ingredient list includes:
 - Sugar — 13.6 g
 - Salt — 2.4 g
 - Vanilla extract — 2.4 ml
+
+With vegan = off the same test shows Milk and Butter (see the label rule in §3).
 
 ---
 
@@ -564,13 +590,16 @@ The v1 release is complete when:
 - [ ] Quantities are displayed with sensible formatting.
 - [ ] Veganize toggle is present and functional.
 - [ ] Vegan labels are data-driven rather than hardcoded in presentation components.
-- [ ] Vinegar remains present in the ingredient model without inventing an amount that is not known from the source.
+- [ ] Vinegar is absent from the recipe (removed by product decision).
+- [ ] English and German are supported, auto-detected, and overridable via `?lang`/`?locale`.
+- [ ] Waffly companion shows tips and is dismissible.
 - [ ] The app is usable on mobile and desktop.
 - [ ] Keyboard and screen-reader basics are covered.
 - [ ] Calculation logic has automated tests.
 - [ ] No backend, login, or database is required.
 - [ ] Recipe-specific data is separated from generic calculation logic.
 - [ ] Adding another recipe later would not require rewriting the calculation engine.
+- [ ] The deployed app (GitHub Pages under `/waffles/`) works offline after the first visit.
 
 ---
 
@@ -606,10 +635,12 @@ The v1 release is complete when:
 
 These should be resolved before treating the recipe as final:
 
-1. **Vinegar quantity:** the screenshot contains the ingredient name but no visible quantity.
-2. **Exact vegan labels:** the screenshot shows the veganize control but does not expose enough information to reliably infer every replacement. Confirm the exact names/changes from the original spreadsheet.
-3. **Whether veganization changes quantities:** currently assume no quantity changes unless the source spreadsheet confirms otherwise.
-4. **Whether waffle count may be fractional:** v1 recommendation is integer waffle counts (1–50). Change only if the original spreadsheet intentionally supports fractions.
+1. ~~Vinegar quantity~~ **Resolved:** the screenshot showed the name with no quantity; vinegar was removed from the recipe entirely by product decision.
+2. ~~Exact vegan labels~~ **Resolved:** Malk (Milk) and Margarine (Butter) taken from the spreadsheet; labels are data-driven and easy to change.
+3. ~~Veganization quantity changes~~ **Resolved:** v1 does not change quantities; the engine supports per-ingredient `veganBaseQuantity`/`veganUnit` for the future.
+4. **Whether waffle count may be fractional:** v1 ships integer waffle counts (1–50, clamped). Change only if the original spreadsheet intentionally supports fractions.
+5. **Additional locales:** v1 ships English + German. Adding a locale means adding a `messages` block; completeness is enforced by the type system and a test.
+6. **"Malk" is an invented brand name:** kept verbatim from the spreadsheet; confirm branding before any store release.
 
 Do not block the initial UI implementation on these questions if the implementation can keep the recipe values/configuration isolated and easy to update.
 
@@ -632,5 +663,34 @@ Implement in small, verifiable steps:
 11. Add accessibility details.
 12. Run tests and production build.
 13. Perform a final manual pass against the acceptance criteria.
+14. Add i18n (en/de), locale detection, and the `?lang`/`?locale` override.
+15. Polish the Waffly companion (tips, tap-to-dismiss, comic-font bubble).
+16. Harden the PWA for offline (build-time precache of hashed assets) and deploy to GitHub Pages under `/waffles/`.
 
 Do not over-engineer v1. The app is a small calculator with a clean path toward a multi-recipe product.
+
+---
+
+## 21. Localization (implemented)
+
+- Locales: English (`en`, default) and German (`de`).
+- Detection order: `?lang=` / `?locale=` query parameter → device `navigator.language` → `en`.
+- Examples: `?lang=de` forces German; an unsupported value (e.g. `?lang=fr`) falls back to the device language.
+- German copy uses locale-aware number style (e.g. "1,5 pro Kind").
+- Device detection works unchanged in a future Capacitor WebView.
+- Ingredient names are translated per ingredient id; the vegan variant name is only swapped when the recipe actually defines a `veganName` (non-exception ingredients keep their normal name in vegan mode).
+
+## 22. Waffly companion (implemented)
+
+- Mascot speech bubble rendered in the comic-style display font.
+- On mobile the mascot floats as a tappable target (96 px) and only appears while a tip is visible; on desktop it is permanent side art.
+- Shows a welcome tip on load and the serving tip from the `?` help button.
+- Tips auto-hide after ~4.5 s; tapping Waffly (or pressing Enter/Space when focused) dismisses them immediately.
+
+## 23. Deployment & offline behavior (implemented)
+
+- Vite `base` is `/waffles/` when `GITHUB_ACTIONS=true`, otherwise `/`; this drives all asset URLs, the `BASE_URL`-prefixed service worker registration, and the manifest paths.
+- GitHub Actions workflow (`.github/workflows/deploy.yml`) runs tests, builds, and deploys to Pages. Pages Source must be set to "GitHub Actions" and the repository named `waffles`.
+- A build-time Vite plugin injects the hashed asset list into `sw.js` (`self.__PRECACHE__`), so the install step precaches the app shell, JS, CSS, icon, and manifest from service-worker-relative paths (safe under `/waffles/`).
+- Fetch strategy is stale-while-revalidate; offline navigations fall back to the cached `index.html`. Cache name is versioned (`waffles-calculator-v2`).
+- Google Fonts are cross-origin and not cached; offline renders fall back to system fonts.
