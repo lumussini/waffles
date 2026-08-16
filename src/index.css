@@ -299,9 +299,10 @@ body {
   border-radius: 14px;
   box-shadow: var(--shadow-pop);
   padding: 10px 14px;
+  font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 1.1rem;
+  line-height: 1.35;
   color: var(--color-ink);
 }
 
@@ -343,7 +344,7 @@ body {
     bottom: 10px;
     width: 200px;
     max-width: 55vw;
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .companion-bubble::after {
