@@ -23,7 +23,7 @@ export function WafflyCompanion({ message, onClose }: WafflyCompanionProps) {
 
   return (
     <aside
-      className={message ? 'calculator-art is-active' : 'calculator-art'}
+      className={message ? 'companion-art is-active' : 'companion-art'}
       onClick={interactive ? onClose : undefined}
       onKeyDown={(event) => {
         if (interactive && (event.key === 'Enter' || event.key === ' ')) {

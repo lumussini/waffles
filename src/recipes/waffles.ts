@@ -2,9 +2,18 @@ import type { Recipe } from './types'
 
 export const waffles: Recipe = {
   id: 'waffles',
-  name: 'Ultimate Waffle',
-  baseServings: 4,
+  nameKey: 'recipe.waffles',
   veganizable: true,
+  scaling: {
+    baseServings: 4,
+    min: 1,
+    max: 50,
+    countHeadingKey: 'countHeading',
+    increaseLabelKey: 'increaseCount',
+    decreaseLabelKey: 'decreaseCount',
+    unitLabelKey: 'numberOfWaffles',
+  },
+  directionIds: ['combine-dry', 'add-remaining', 'cook', 'top'],
   ingredients: [
     {
       id: 'milk',
@@ -12,12 +21,16 @@ export const waffles: Recipe = {
       veganName: 'Malk',
       baseQuantity: 180,
       unit: 'ml',
+      usQuantity: 0.75,
+      usUnit: 'cup',
     },
     {
       id: 'flour',
       name: 'Flour',
       baseQuantity: 120,
       unit: 'g',
+      usQuantity: 1,
+      usUnit: 'cup',
     },
     {
       id: 'fat',
@@ -25,30 +38,40 @@ export const waffles: Recipe = {
       veganName: 'Margarine',
       baseQuantity: 60,
       unit: 'g',
+      usQuantity: 0.25,
+      usUnit: 'cup',
     },
     {
       id: 'baking-powder',
       name: 'Baking powder',
       baseQuantity: 7,
       unit: 'g',
+      usQuantity: 1.5,
+      usUnit: 'tsp',
     },
     {
       id: 'sugar',
       name: 'Sugar',
       baseQuantity: 6.8,
       unit: 'g',
+      usQuantity: 1.5,
+      usUnit: 'tsp',
     },
     {
       id: 'salt',
       name: 'Salt',
       baseQuantity: 1.2,
       unit: 'g',
+      usQuantity: 0.25,
+      usUnit: 'tsp',
     },
     {
       id: 'vanilla',
       name: 'Vanilla extract',
       baseQuantity: 1.2,
       unit: 'ml',
+      usQuantity: 0.25,
+      usUnit: 'tsp',
     },
   ],
 }

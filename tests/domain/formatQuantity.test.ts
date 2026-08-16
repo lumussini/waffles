@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatQuantity } from '../../src/domain/formatQuantity'
+import { formatQuantity, formatUsQuantity } from '../../src/domain/formatQuantity'
 
 describe('formatQuantity', () => {
   it.each([
@@ -31,5 +31,39 @@ describe('formatQuantity', () => {
     expect(formatQuantity(Number.NaN)).toBe('')
     expect(formatQuantity(Number.POSITIVE_INFINITY)).toBe('')
     expect(formatQuantity(Number.NEGATIVE_INFINITY)).toBe('')
+  })
+})
+
+describe('formatUsQuantity', () => {
+  it('formats whole numbers without fractions', () => {
+    expect(formatUsQuantity(1)).toBe('1')
+    expect(formatUsQuantity(2)).toBe('2')
+    expect(formatUsQuantity(0)).toBe('0')
+  })
+
+  it('formats common baking fractions', () => {
+    expect(formatUsQuantity(0.25)).toBe('1/4')
+    expect(formatUsQuantity(0.33)).toBe('1/3')
+    expect(formatUsQuantity(0.5)).toBe('1/2')
+    expect(formatUsQuantity(0.67)).toBe('2/3')
+    expect(formatUsQuantity(0.75)).toBe('3/4')
+  })
+
+  it('formats mixed numbers', () => {
+    expect(formatUsQuantity(1.25)).toBe('1 1/4')
+    expect(formatUsQuantity(1.5)).toBe('1 1/2')
+    expect(formatUsQuantity(1.75)).toBe('1 3/4')
+    expect(formatUsQuantity(2.5)).toBe('2 1/2')
+  })
+
+  it('falls back to decimal for awkward values', () => {
+    expect(formatUsQuantity(0.17)).toBe('1/6')
+    expect(formatUsQuantity(2.858344)).toBe('2 5/6')
+    expect(formatUsQuantity(0.08)).toBe('1/12')
+  })
+
+  it('returns an empty string for non-finite values', () => {
+    expect(formatUsQuantity(Number.NaN)).toBe('')
+    expect(formatUsQuantity(Number.POSITIVE_INFINITY)).toBe('')
   })
 })

@@ -1,0 +1,132 @@
+import type { Recipe } from './types'
+
+const basicIngredients: Recipe['ingredients'] = [
+  {
+    id: 'flour',
+    name: 'All-purpose flour',
+    baseQuantity: 240,
+    unit: 'g',
+    usQuantity: 2,
+    usUnit: 'cup',
+  },
+  {
+    id: 'sugar',
+    name: 'Granulated sugar',
+    baseQuantity: 300,
+    unit: 'g',
+    usQuantity: 1.5,
+    usUnit: 'cup',
+  },
+  {
+    id: 'cocoa',
+    name: 'Unsweetened cocoa powder',
+    baseQuantity: 60,
+    unit: 'g',
+    usQuantity: 0.67,
+    usUnit: 'cup',
+  },
+  {
+    id: 'baking-soda',
+    name: 'Baking soda',
+    baseQuantity: 10,
+    unit: 'g',
+    usQuantity: 2,
+    usUnit: 'tsp',
+  },
+  {
+    id: 'salt',
+    name: 'Salt',
+    baseQuantity: 6,
+    unit: 'g',
+    usQuantity: 1,
+    usUnit: 'tsp',
+  },
+  {
+    id: 'water',
+    name: 'Water',
+    baseQuantity: 480,
+    unit: 'ml',
+    usQuantity: 2,
+    usUnit: 'cup',
+  },
+  {
+    id: 'oil',
+    name: 'Vegetable oil',
+    baseQuantity: 150,
+    unit: 'ml',
+    usQuantity: 0.67,
+    usUnit: 'cup',
+  },
+  {
+    id: 'vanilla',
+    name: 'Vanilla extract',
+    baseQuantity: 10,
+    unit: 'ml',
+    usQuantity: 2,
+    usUnit: 'tsp',
+  },
+  {
+    id: 'vinegar',
+    name: 'White vinegar',
+    baseQuantity: 10,
+    unit: 'ml',
+    usQuantity: 2,
+    usUnit: 'tsp',
+  },
+]
+
+const zebraIngredients: Recipe['ingredients'] = [
+  ...basicIngredients,
+  {
+    id: 'cocoa-extra',
+    name: 'Unsweetened cocoa powder (extra)',
+    baseQuantity: 16,
+    unit: 'g',
+    usQuantity: 2,
+    usUnit: 'tbsp',
+  },
+]
+
+export const veganCake: Recipe = {
+  id: 'vegan-cake',
+  nameKey: 'recipe.vegan-cake',
+  ingredients: basicIngredients,
+  directionIds: [],
+  variants: [
+    {
+      id: 'basic',
+      labelKey: 'variant.basic',
+      ingredients: basicIngredients,
+      directionIds: [
+        'cake.preheat',
+        'cake.mix-dry',
+        'cake.mix-wet',
+        'cake.combined',
+        'cake.pour',
+        'cake.bake',
+        'cake.cool',
+        'cake.serve',
+      ],
+    },
+    {
+      id: 'zebra',
+      labelKey: 'variant.zebra',
+      ingredients: zebraIngredients,
+      directionIds: [
+        'cake.preheat',
+        'cake.mix-dry',
+        'cake.mix-wet',
+        'cake.combined',
+        'cake.separate',
+        'cake.cocoa-mix',
+        'cake.alternate',
+        'cake.swirl',
+        'cake.bake',
+        'cake.cool',
+        'cake.slice',
+        'cake.serve',
+      ],
+    },
+  ],
+  defaultVariantId: 'basic',
+}

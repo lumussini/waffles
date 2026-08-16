@@ -1,4 +1,4 @@
-const CACHE_NAME = 'waffles-calculator-v2'
+const CACHE_NAME = 'little-bites-v1'
 
 const PRECACHE_URLS = self.__PRECACHE__ ?? ['./', './index.html']
 

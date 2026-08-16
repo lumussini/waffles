@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react'
 
 function swPrecache(): Plugin {
   return {
-    name: 'waffles-sw-precache',
+    name: 'little-bites-sw-precache',
     closeBundle() {
       const distDir = join(process.cwd(), 'dist')
       const swPath = join(distDir, 'sw.js')
@@ -33,7 +33,7 @@ function swPrecache(): Plugin {
 }
 
 export default defineConfig({
-  base: process.env.GITHUB_ACTIONS === 'true' ? '/waffles/' : '/',
+  base: process.env.GITHUB_ACTIONS === 'true' ? '/little-bites/' : '/',
   plugins: [react(), swPrecache()],
   test: {
     environment: 'jsdom',

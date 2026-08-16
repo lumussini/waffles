@@ -7,22 +7,79 @@
     <meta name="theme-color" content="#1d3557" />
     <meta
       name="description"
-      content="A playful waffle ingredient calculator. Pick a count, scale the recipe, and veganize it."
+      content="Little Bites — discover, scale, and veganize recipes with Waffly."
     />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icon.svg" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>Ultimate Waffle Ingredients Calculator</title>
+    <title>Little Bites</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;700;800&display=swap"
       rel="stylesheet"
     />
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        background: #fff6ea;
+        background-image: radial-gradient(rgba(230, 57, 70, 0.07) 2px, transparent 2px),
+          radial-gradient(rgba(45, 106, 79, 0.06) 2px, transparent 2px);
+        background-size: 48px 48px, 72px 72px;
+        background-position: 0 0, 24px 24px;
+        transition: opacity 0.3s ease;
+      }
+      #splash.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash img {
+        width: 128px;
+        height: 128px;
+        animation: splash-float 3s ease-in-out infinite;
+      }
+      #splash h1 {
+        font-family: 'Lilita One', 'Trebuchet MS', cursive;
+        color: #e63946;
+        font-size: clamp(1.6rem, 5vw, 2.4rem);
+        margin: 0;
+        text-shadow: 2px 2px 0 rgba(255, 209, 102, 0.9);
+      }
+      #splash p {
+        font-family: 'Nunito', system-ui, sans-serif;
+        color: #6b5847;
+        margin: 0;
+        font-size: 0.95rem;
+      }
+      @keyframes splash-float {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        50% { transform: translateY(-8px) rotate(2deg); }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash">
+      <img src="/icon.svg" alt="Waffle icon" />
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Hide splash once React has mounted
+      window.addEventListener('load', function () {
+        var splash = document.getElementById('splash');
+        if (splash) {
+          splash.classList.add('hide');
+          setTimeout(function () { splash.remove(); }, 350);
+        }
+      });
+    </script>
   </body>
 </html>
