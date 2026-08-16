@@ -6,6 +6,7 @@ export type ScaledIngredient = {
   name: string
   quantity: number | null
   unit: string
+  vegan: boolean
 }
 
 export type CalculateOptions = {
@@ -29,13 +30,13 @@ export function calculateRecipe(
     const unit = vegan ? (ingredient.veganUnit ?? ingredient.unit) : ingredient.unit
 
     if (ingredient.baseQuantity === null) {
-      return { ingredient, name, quantity: null, unit }
+      return { ingredient, name, quantity: null, unit, vegan }
     }
 
     const baseQuantity = vegan
       ? (ingredient.veganBaseQuantity ?? ingredient.baseQuantity)
       : ingredient.baseQuantity
 
-    return { ingredient, name, quantity: baseQuantity * factor, unit }
+    return { ingredient, name, quantity: baseQuantity * factor, unit, vegan }
   })
 }

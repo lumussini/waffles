@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useI18n } from '../i18n/I18nContext'
 
 type WaffleCountControlProps = {
   value: number
@@ -8,6 +9,7 @@ type WaffleCountControlProps = {
 }
 
 export function WaffleCountControl({ value, min, max, onChange }: WaffleCountControlProps) {
+  const { t } = useI18n()
   const [draft, setDraft] = useState(String(value))
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export function WaffleCountControl({ value, min, max, onChange }: WaffleCountCon
         className="count-button"
         onClick={decrement}
         disabled={value <= min}
-        aria-label="Decrease waffle count"
+        aria-label={t('decreaseCount')}
       >
         −
       </button>
@@ -81,14 +83,14 @@ export function WaffleCountControl({ value, min, max, onChange }: WaffleCountCon
             commit(draft)
           }
         }}
-        aria-label="Number of waffles"
+        aria-label={t('numberOfWaffles')}
       />
       <button
         type="button"
         className="count-button"
         onClick={increment}
         disabled={value >= max}
-        aria-label="Increase waffle count"
+        aria-label={t('increaseCount')}
       >
         +
       </button>

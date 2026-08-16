@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { calculateRecipe } from '../domain/calculateRecipe'
+import { useI18n } from '../i18n/I18nContext'
 import { getRecipe } from '../recipes'
 import type { AppState } from '../state/storage'
 import { loadState, saveState, WAFFLE_COUNT_MAX, WAFFLE_COUNT_MIN } from '../state/storage'
@@ -8,12 +9,10 @@ import { VeganToggle } from './VeganToggle'
 import { WaffleCountControl } from './WaffleCountControl'
 import { WafflyCompanion } from './WafflyCompanion'
 
-const WELCOME_TIP = "It's waffle time!"
-const SERVING_TIP = 'Recommended serving: 2 per adult, 1.5 per kid.'
-
 export function WaffleCalculator() {
+  const { t } = useI18n()
   const [state, setState] = useState<AppState>(() => loadState(window.localStorage))
-  const [tip, setTip] = useState<string | null>(WELCOME_TIP)
+  const [tip, setTip] = useState<string | null>(t('welcomeTip'))
   const closeTip = useCallback(() => setTip(null), [])
 
   useEffect(() => {
@@ -39,14 +38,13 @@ export function WaffleCalculator() {
   }
 
   const showServingTip = () => {
-    setTip(SERVING_TIP)
+    setTip(t('servingTip'))
   }
 
   return (
     <div className="calculator">
       <header className="calculator-header">
-        <h1 className="calculator-title">Ultimate waffle ingredients calculator</h1>
-        <p className="calculator-subtitle">Scale a batch, then make it whatever you need it to be.</p>
+        <h1 className="calculator-title">{t('title')}</h1>
       </header>
 
       <div className="calculator-body">
@@ -54,13 +52,13 @@ export function WaffleCalculator() {
           <section className="count-card" aria-labelledby="count-heading">
             <div className="count-card-header">
               <h2 id="count-heading" className="count-heading">
-                How many waffles?
+                {t('countHeading')}
               </h2>
               <button
                 type="button"
                 className="help-button"
                 onClick={showServingTip}
-                aria-label="Show recommended serving per person"
+                aria-label={t('helpLabel')}
               >
                 ?
               </button>

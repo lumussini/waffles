@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useI18n } from '../i18n/I18nContext'
 import { WaffleIllustration } from './WaffleIllustration'
 
 export const TIP_DURATION_MS = 4500
@@ -9,6 +10,7 @@ type WafflyCompanionProps = {
 }
 
 export function WafflyCompanion({ message, onClose }: WafflyCompanionProps) {
+  const { t } = useI18n()
   useEffect(() => {
     if (!message) {
       return
@@ -31,7 +33,7 @@ export function WafflyCompanion({ message, onClose }: WafflyCompanionProps) {
       }}
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
-      aria-label={interactive ? "Hide Waffly's tip" : undefined}
+      aria-label={interactive ? t('hideTip') : undefined}
     >
       <WaffleIllustration />
       {message && (
