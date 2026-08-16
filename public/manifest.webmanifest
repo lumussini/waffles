@@ -1,0 +1,24 @@
+{
+  "name": "Ultimate Waffle Ingredients Calculator",
+  "short_name": "Waffles",
+  "description": "Scale and veganize the ultimate waffle recipe.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff6ea",
+  "theme_color": "#1d3557",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
