@@ -1,7 +1,9 @@
-const CACHE_NAME = 'waffles-calculator-v1'
+const CACHE_NAME = 'waffles-calculator-v2'
+
+const PRECACHE_URLS = self.__PRECACHE__ ?? ['./', './index.html']
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['/', '/index.html'])))
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)))
   self.skipWaiting()
 })
 
@@ -30,7 +32,7 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy))
           return response
         })
-        .catch(() => caches.match('/index.html')),
+        .catch(() => caches.match('./index.html')),
     )
     return
   }
